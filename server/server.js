@@ -1,4 +1,4 @@
-const {ObjectID} = require('mongodb');
+var {ObjectID} = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -46,6 +46,29 @@ app.get('/todos/:id', (req, res) => {
     }).catch((err) => {
       res.status(400).send();
     });
+});
+
+app.delete('/todos', (req, res) =>{
+  Todo.remove({}).then((todos) => {
+    res.send({todos});
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
+app.delete('/todos/:id', (req, res) => {
+  var id = req.params.id;
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+  Todo.findByIdAndRemove(id).then((todo) => {
+    if(!todo) {
+      return res.status(404).send();
+    }
+    res.send({todo});
+  }).catch((e) =>{
+    res.status(400).send();
+  });
 });
 
 app.listen(port, () => {
